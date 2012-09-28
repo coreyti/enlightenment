@@ -4,9 +4,9 @@ require 'enlightenment/engine'
 #
 # secondary:
 #
-#   * [ ] store validations for non-existent forms (they may show up)
-#   * [ ] handle dynamic field additions     -- may require patching jquery.validate
-#   * [ ] define validation method for AssociatedValidator
+#   * [*] store validations for non-existent forms (they may show up)
+#   * [*] handle dynamic field additions     -- may require patching jquery.validate (DID NOT)
+#   * [*] define validation method for AssociatedValidator
 #   * [ ] add validation via AJAX callback
 #   * [ ] add i18n messages                  -- may require patching jquery.validate
 #   * [ ] add support for "field error proc" -- may require patching jquery.validate
@@ -20,7 +20,11 @@ require 'enlightenment/engine'
 #   * [ ] handle duplicate forms (e.g., registration at top AND bottom)
 #
 module Enlightenment
-  autoload :Rules, 'enlightenment/rules'
+  autoload :Rules,                  'enlightenment/rules'
+
+  module Validations
+    autoload :ValidatesAssociated,  'enlightenment/validations/validates_associated'
+  end
 
   mattr_accessor :validate_models
   @@validate_models = {}
