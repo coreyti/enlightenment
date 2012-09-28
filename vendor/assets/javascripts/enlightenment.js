@@ -35,7 +35,7 @@
         source[placement](clone);
         result.push(clone[0]);
 
-        $(document).trigger('foo', clone.closest('form'));
+        clone.closest('form').trigger('revalidate');
       });
 
       return $(result);

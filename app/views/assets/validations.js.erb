@@ -1,7 +1,11 @@
 <% if validations %>
 (function($) {
+  var original;
+
   $(function() {
-    $.each(rulemap(<%= validations.html_safe %>), function(name, rules) {
+    original = rulemap(<%= validations.html_safe %>);
+
+    $.each(original, function(name, rules) {
       $(['form', name, 'validate'].join('.')).validate(rules.real);
     });
   });
@@ -13,9 +17,10 @@
       .filter(selector);
   }
 
-  function rulemap(original) {
+  function rulemap(config) {
+    var context;
     var converted  = {};
-    var resources  = original.resources;
+    var resources  = config.resources;
     var nestedWrap = 'div.form-inputs';
 
     function map(ruleSet, context, mapping) {
@@ -27,7 +32,7 @@
             associated = resources[rules.associated];
 
             if(associated) {
-              map(associated.rules, nested, mapping);
+              map((associated.rules || associated.base.rules), nested, mapping);
             }
           }
           else {
@@ -41,18 +46,39 @@
       }
     }
 
-    $.each(resources, function(name, config) {
-      var context = $(['form', name, 'validate'].join('.'));
-      var mapping = converted[name] = {
-        base : $.extend(true, {}, config),
-        real : $.extend(true, {}, defaults)
-      };
+    // top-level/ready setup
+    if(resources) {
+      $.each(resources, function(name, config) {
+        var context = $(['form', name, 'validate'].join('.'));
+        var mapping = converted[name] = {
+          base : $.extend(true, {}, config),
+          real : $.extend(true, {}, defaults)
+        };
 
-      map(config.rules, context, mapping.real);
-    });
+        map(config.rules, context, mapping.real);
+      });
+    }
+    // contextual additions
+    else {
+      resources = original;
+      context   = $(config);
+
+      $.each(original, function(type, config) {
+        if(context.hasClass(type)) {
+          map(config.base.rules, context, config.real);
+          context
+            .removeData('validator')
+            .validate(config.real);
+        }
+      });
+    }
 
     return converted;
   }
+
+  $(document).on('revalidate', 'form', function(e) {
+    rulemap(this);
+  });
 
   var defaults = {
     // errorElement : 'span',
