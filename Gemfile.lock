@@ -2,6 +2,8 @@ PATH
   remote: .
   specs:
     enlightenment (0.0.1)
+      green_light
+      jquery-rails
       rails (~> 3.2.8)
 
 GEM
@@ -37,6 +39,7 @@ GEM
     arel (3.0.2)
     builder (3.0.3)
     erubis (2.7.0)
+    green_light (0.1.5)
     hike (1.2.1)
     i18n (0.6.1)
     journey (1.0.4)

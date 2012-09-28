@@ -1,0 +1,71 @@
+<% if validations %>
+(function($) {
+  $(function() {
+    $.each(rulemap(<%= validations.html_safe %>), function(name, rules) {
+      $(['form', name, 'validate'].join('.')).validate(rules.real);
+    });
+  });
+
+  function elements(selector, context) {
+    return context
+      .find('input, select, textarea')
+      .not(':submit, :reset, :image, [disabled]')
+      .filter(selector);
+  }
+
+  function rulemap(original) {
+    var converted  = {};
+    var resources  = original.resources;
+    var nestedWrap = 'div.form-inputs';
+
+    function map(ruleSet, context, mapping) {
+      // only map for existing content (avoids infinite loop)
+      if(context.length) {
+        $.each(ruleSet, function(attribute, rules, nested, associated) {
+          if(rules.associated) {
+            nested     = $([nestedWrap, attribute].join('.'), context);
+            associated = resources[rules.associated];
+
+            if(associated) {
+              map(associated.rules, nested, mapping);
+            }
+          }
+          else {
+            $(elements('.' + attribute, context)).each(function() {
+              if( ! mapping.rules[this.name]) {
+                mapping.rules[this.name] = rules;
+              }
+            });
+          }
+        });
+      }
+    }
+
+    $.each(resources, function(name, config) {
+      var context = $(['form', name, 'validate'].join('.'));
+      var mapping = converted[name] = {
+        base : $.extend(true, {}, config),
+        real : $.extend(true, {}, defaults)
+      };
+
+      map(config.rules, context, mapping.real);
+    });
+
+    return converted;
+  }
+
+  var defaults = {
+    // errorElement : 'span',
+    rules        : {}
+  };
+
+  // Custom code for regex validation.
+  $.validator.addMethod("regex", function(value, element, regexp) {
+      var check = false;
+      var re = new RegExp(regexp);
+      return this.optional(element) || re.test(value);
+    },
+    "You have entered an invalid value for this field"
+  );
+})(jQuery);
+<% end %>
