@@ -9,4 +9,7 @@ Enlightenment::Engine.routes.draw do
   match "pages(/?)" => "pages#show",
     :name => 'index',
     :via  => :get
+
+  match "validations" => "validations#create",
+    :via  => :post
 end

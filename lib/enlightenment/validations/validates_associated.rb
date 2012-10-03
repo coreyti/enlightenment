@@ -5,8 +5,8 @@ module Enlightenment
 
       module ClassMethods
         def associated_validator(params = {})
-          field_name = params[:field_name].to_s.singularize
-          { :associated => field_name.to_sym }
+          field = params[:field].to_s.singularize
+          { :associated => field.to_sym }
         end
       end
     end
