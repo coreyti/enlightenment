@@ -1,4 +1,5 @@
 require 'enlightenment/engine'
+require 'i18n-js'
 
 # TODO
 #

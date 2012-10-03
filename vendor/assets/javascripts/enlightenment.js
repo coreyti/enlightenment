@@ -1,3 +1,5 @@
+//= require i18n
+//= require i18n/translations
 //= require jquery.validate
 
 (function($) {
@@ -46,6 +48,8 @@
 
   // extensions to jquery.validate
   // --------------------------------------------------------------------------
+  $.validator.pending = {};
+
   $.validator.addMethod('regex', function(value, element, regexp) {
       var check = false;
       var re = new RegExp(regexp.replace('\\A', '^').replace('\\z', '$'));
@@ -57,6 +61,7 @@
   $.validator.addMethod('remote', function(value, element, url) {
     var validator = this;
     var form      = $(element).closest('form');
+    var name      = element.name;
     var previous  = this.previousValue(element);
 
     $.ajax({
@@ -64,6 +69,18 @@
       type     : 'post',
       dataType : 'json',
       data     : form.serialize(),
+
+      beforeSend : function beforeSend(xhr, settings) {
+        if($.validator.pending[name]) {
+          $.validator.pending[name].abort();
+        }
+
+        $.validator.pending[name] = xhr;
+      },
+
+      complete : function complete(xhr, status) {
+        delete $.validator.pending[name]
+      },
 
       success : function success(response, status, xhr) {
         var submitted = validator.formSubmitted;
@@ -80,18 +97,47 @@
       },
 
       error : function error(xhr, status, error) {
-        var response = JSON.parse(xhr.responseText);
-        var errors   = {};
-        errors[element.name] = response.message;
+        var text = xhr.responseText;
 
-        validator.invalid[element.name] = true;
-        validator.showErrors(errors);
+        if(text) {
+          var response = JSON.parse(xhr.responseText);
+          var errors   = {};
+          errors[element.name] = response.message;
 
-        previous.valid = false;
-        validator.stopRequest(element, false);
+          validator.invalid[element.name] = true;
+          validator.showErrors(errors);
+
+          previous.valid = false;
+          validator.stopRequest(element, false);
+        }
       }
     });
 
     return "pending"; // TODO: i18n
   });
+
+  $.validator.messages = {
+    required    : message('blank'),
+    // remote      : message('invalid'),
+    email       : message('invalid'),
+    url         : message('invalid'),
+    date        : message('invalid'),
+    dateISO     : message('invalid'),
+    number      : message('invalid'),
+    digits      : message('invalid'),
+    creditcard  : message('invalid'),
+    equalTo     : message('invalid'),
+    maxlength   : message('invalid'),
+    minlength   : message('invalid'),
+    rangelength : message('invalid'),
+    range       : message('invalid'),
+    max         : message('invalid'),
+    min         : message('invalid')
+  };
+
+  function message(key) {
+    return function message(parameters, field) {
+      return I18n.t(key, { scope : 'errors.messages' });
+    }
+  }
 })(jQuery);

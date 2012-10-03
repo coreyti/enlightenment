@@ -37,8 +37,10 @@
           }
           else {
             $(elements('.' + attribute, context)).each(function() {
-              if( ! mapping.rules[this.name]) {
-                mapping.rules[this.name] = rules;
+              var name = this.name;
+
+              if( ! mapping.rules[name]) {
+                mapping.rules[name] = rules;
               }
             });
           }

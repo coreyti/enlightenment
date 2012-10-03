@@ -3,6 +3,7 @@ PATH
   specs:
     enlightenment (0.0.1)
       green_light
+      i18n-js
       jquery-rails
       rails (~> 3.2.8)
 
@@ -42,6 +43,8 @@ GEM
     green_light (0.1.5)
     hike (1.2.1)
     i18n (0.6.1)
+    i18n-js (2.1.2)
+      i18n
     journey (1.0.4)
     jquery-rails (2.1.3)
       railties (>= 3.1.0, < 5.0)
