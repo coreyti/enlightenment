@@ -47,8 +47,14 @@ module Enlightenment
     autoload :ValidatesUniqueness,  'enlightenment/validations/validates_uniqueness'
   end
 
+  mattr_accessor :validate_config
+  @@validate_config = {}
+
   mattr_accessor :validate_models
   @@validate_models = {}
+
+  mattr_accessor :message_sanitizer
+  @@message_sanitizer = nil
 
   def self.setup
     yield self

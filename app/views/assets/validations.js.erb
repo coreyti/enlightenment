@@ -1,14 +1,55 @@
-<% if validations %>
+<% if models %>
 (function($) {
   var original;
+  var settings = {};
+
+  <% if config %>
+  settings = <%= config.html_safe %>;
+  <% end %>
 
   $(function() {
-    original = rulemap(<%= validations.html_safe %>);
+    original = rulemap(<%= models.html_safe %>);
 
     $.each(original, function(name, rules) {
-      $(['form', name, 'validate'].join('.')).validate(rules.real);
+      attach($(['form', name, 'validate'].join('.')), rules);
     });
   });
+
+  <% if config %>
+  $(document).ajaxComplete(function(e, xhr, options) {
+    var text = xhr.responseText;
+    var conf, json, keys;
+
+   try {
+      json = JSON.parse(text);
+      keys = settings.keys || [];
+
+      $.each(keys, function(i, key) {
+        var html = json[key];
+        var current;
+
+        if(html) {
+          $('form', html).each(function() {
+            var converted = rulemap(this);
+            $.each(converted, function(type, rules) {
+              attach($(['form', type, 'validate'].join('.')), rules);
+            });
+          });
+        }
+      });
+   }
+   catch(e) {}
+  });
+  <% end %>
+
+  $(document).on('revalidate', 'form', function(e) {
+    rulemap(this);
+  });
+
+  // TODO: move to $.enlightenment
+  function attach(forms, rules) {
+    forms.validate(rules.real);
+  }
 
   function elements(selector, context) {
     return context
@@ -67,10 +108,11 @@
 
       $.each(original, function(type, config) {
         if(context.hasClass(type)) {
+          converted[type] = original[type];
           map(config.base.rules, context, config.real);
-          context
-            .removeData('validator')
-            .validate(config.real);
+
+          context.removeData('validator');
+          attach(context, config);
         }
       });
     }
@@ -78,13 +120,22 @@
     return converted;
   }
 
-  $(document).on('revalidate', 'form', function(e) {
-    rulemap(this);
-  });
-
+  // TODO: make configurable from Enlightement initializer.
   var defaults = {
-    // errorElement : 'span',
-    rules : {}
+    focusCleanup : true,
+    focusInvalid : false,
+    rules        : {},
+    wrapper      : 'div.tooltip',
+    onkeyup      : false
+    // errorElement : 'span'
   };
+
+  <% if config %>
+  if(settings.event) {
+    defaults.showErrors = function showErrors(map, list) {
+      $(this.currentElements).trigger(settings.event, [this, map, list]);
+    };
+  }
+  <% end %>
 })(jQuery);
 <% end %>

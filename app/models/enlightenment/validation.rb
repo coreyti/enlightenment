@@ -21,6 +21,10 @@ module Enlightenment
       @complete = instance.errors
       @messages = @complete.messages[field]
 
+      if Enlightenment.message_sanitizer
+        @messages.map! { |msg| Enlightenment.message_sanitizer.call(msg) }
+      end
+
       @messages.blank?
     end
   end

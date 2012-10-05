@@ -48,8 +48,6 @@
 
   // extensions to jquery.validate
   // --------------------------------------------------------------------------
-  $.validator.pending = {};
-
   $.validator.addMethod('regex', function(value, element, regexp) {
       var check = false;
       var re = new RegExp(regexp.replace('\\A', '^').replace('\\z', '$'));
@@ -59,10 +57,31 @@
   );
 
   $.validator.addMethod('remote', function(value, element, url) {
+    if(this.optional(element)) {
+      return "dependency-mismatch";
+    }
+
     var validator = this;
     var form      = $(element).closest('form');
     var name      = element.name;
     var previous  = this.previousValue(element);
+
+    if( ! this.settings.messages[element.name]) {
+      this.settings.messages[element.name] = {};
+    }
+
+    previous.originalMessage = this.settings.messages[element.name].remote;
+    this.settings.messages[element.name].remote = previous.message;
+
+    if ( this.pending[element.name] ) {
+      return "pending";
+    }
+    if ( previous.old === value ) {
+      return previous.valid;
+    }
+
+    previous.old = value;
+    this.startRequest(element);
 
     $.ajax({
       url      : url,
@@ -71,20 +90,21 @@
       data     : form.serialize(),
 
       beforeSend : function beforeSend(xhr, settings) {
-        if($.validator.pending[name]) {
-          $.validator.pending[name].abort();
+        if(pending[name]) {
+          pending[name].abort();
         }
 
-        $.validator.pending[name] = xhr;
+        pending[name] = xhr;
       },
 
       complete : function complete(xhr, status) {
-        delete $.validator.pending[name]
+        delete pending[name];
       },
 
       success : function success(response, status, xhr) {
         var submitted = validator.formSubmitted;
 
+        validator.settings.messages[element.name].remote = previous.originalMessage;
         validator.prepareElement(element);
         validator.formSubmitted = submitted;
         validator.successList.push(element);
@@ -98,11 +118,12 @@
 
       error : function error(xhr, status, error) {
         var text = xhr.responseText;
+        validator.settings.messages[element.name].remote = previous.originalMessage;
 
         if(text) {
           var response = JSON.parse(xhr.responseText);
           var errors   = {};
-          errors[element.name] = response.message;
+          errors[element.name] = previous.message = response.message;
 
           validator.invalid[element.name] = true;
           validator.showErrors(errors);
@@ -113,11 +134,19 @@
       }
     });
 
-    return "pending"; // TODO: i18n
+    return "pending";
   });
 
+  $.validator.prototype.addWrapper = function(target) {
+    if(this.settings.wrapper) {
+      target = target.add(target.closest(this.settings.wrapper));
+    }
+
+    return target;
+  };
+
   $.validator.messages = {
-    required    : message('blank'),
+    required    : message('invalid'),
     // remote      : message('invalid'),
     email       : message('invalid'),
     url         : message('invalid'),
@@ -135,9 +164,11 @@
     min         : message('invalid')
   };
 
+  var pending = {};
+
   function message(key) {
     return function message(parameters, field) {
-      return I18n.t(key, { scope : 'errors.messages' });
+      return I18n.t(key, { scope : 'activerecord.errors.messages' });
     }
   }
 })(jQuery);

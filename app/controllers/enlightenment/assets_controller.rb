@@ -5,7 +5,10 @@ module Enlightenment
     def show
       super({
         :layout => false,
-        :locals => { :validations => Enlightenment::Rules.generate(Enlightenment.validate_models) }
+        :locals => {
+          :config => validate_config,
+          :models => validate_models
+        }
       })
     end
 
@@ -14,6 +17,15 @@ module Enlightenment
       # handle deprecation warning.
       def path
         super.sub(/\.js$/, '')
+      end
+
+      def validate_config
+        config = Enlightenment.validate_config
+        config.present? ? config.to_json : nil
+      end
+
+      def validate_models
+        Enlightenment::Rules.generate(Enlightenment.validate_models)
       end
   end
 end
