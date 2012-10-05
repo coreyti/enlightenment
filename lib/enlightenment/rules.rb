@@ -10,12 +10,15 @@ module Enlightenment
       def generate(models)
         data = {}
 
-        models.each do |model|
-          key   = model.to_s.underscore.downcase
-          rules = {}
+        models.each do |input|
+          model, config = prepare(input)
+          key        = model.underscore.downcase
+          rules      = {}
+          exclusions = config[:exclude] || {}
 
           model.constantize._validators.each do |field, validators|
-            rules[field] = parse_each_validation(model, field, validators)
+            exclude = exclusions[field] || []
+            rules[field] = parse_validators(model, field, validators, exclude)
           end
 
           data[key] = { :rules => rules }
@@ -26,24 +29,33 @@ module Enlightenment
 
       private
 
-        # TODO: be sure to APPEND ajax versions, so they run last
-        def parse_each_validation(model, field, validators)
+        def parse_validators(model, field, validators, exclude = [])
           data, params = {}, {}
           params[:model], params[:field] = model, field
 
           validators.each do |validator|
             params[:val_obj] = validator
-            method = validator.class.name.split('::').last.underscore
+            method  = validator.class.name.split('::').last.underscore
 
-            if respond_to?(method)
-              result = send(method, params)
-              data.merge!(result) unless result.nil?
-            else
-              data.merge!(callback_validator(params))
+            unless exclude.include?(method.sub(/_validator$/, '').to_sym)
+              if respond_to?(method)
+                result = send(method, params)
+                data.merge!(result) unless result.nil?
+              else
+                data.merge!(callback_validator(params))
+              end
             end
           end
 
           data
+        end
+
+        def prepare(input)
+          if input.is_a?(String)
+            { input => {} }
+          else
+            input
+          end.flatten
         end
     end
   end
