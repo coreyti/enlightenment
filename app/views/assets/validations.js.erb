@@ -42,6 +42,11 @@
   });
   <% end %>
 
+  // ???
+  $.enlightenment.rules = function rules() {
+    return original;
+  };
+
   $(document).on('revalidate', 'form', function(e) {
     rulemap(this);
   });

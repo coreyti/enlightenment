@@ -2,6 +2,7 @@
 /.env
 /.gemset
 /.rvmrc
+/.rspec
 
 /log/*.log
 /pkg/*

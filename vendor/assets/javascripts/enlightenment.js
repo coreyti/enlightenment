@@ -3,6 +3,10 @@
 //= require jquery.validate
 
 (function($) {
+  $.enlightenment = {};
+
+
+
   // extensions to jquery
   // --------------------------------------------------------------------------
   $.fn.extend({
@@ -121,7 +125,7 @@
         validator.settings.messages[element.name].remote = previous.originalMessage;
 
         if(text) {
-          var response = JSON.parse(xhr.responseText);
+          var response = JSON.parse(text);
           var errors   = {};
           errors[element.name] = previous.message = response.message;
 
@@ -143,6 +147,11 @@
     }
 
     return target;
+  };
+
+  // TODO: make non-specific to bootstrap & app-custom label
+  $.validator.prototype.errorsFor = function(element) {
+    return $(element).closest('div.controls').find('label.error');
   };
 
   $.validator.messages = {
