@@ -9,7 +9,7 @@ GIT
 PATH
   remote: .
   specs:
-    enlightenment (0.0.1.pre.1)
+    enlightenment (0.0.1.pre.2)
       green_light
       i18n-js
       jquery-rails

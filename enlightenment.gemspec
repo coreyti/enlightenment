@@ -13,7 +13,8 @@ Gem::Specification.new do |s|
   s.summary     = "WIP: Enlightenment."
   s.description = "WIP: Enlightenment."
 
-  s.files = Dir["{app,config,db,lib}/**/*"] + ["MIT-LICENSE", "Rakefile", "README.rdoc"]
+  s.files       = `git ls-files`.split($\)
+  s.test_files  = s.files.grep(%r{^(test|spec|features)/})
 
   # s.add_dependency "rails", "~> 3.2.8"
   s.add_dependency "rails", "~> 3.2.3"
