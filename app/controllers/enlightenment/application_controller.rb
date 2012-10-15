@@ -1,5 +1,5 @@
 module Enlightenment
-  class ApplicationController < ActionController::Base
+  class ApplicationController < ::ApplicationController
     def show(options = {})
       render(path, options)
     end

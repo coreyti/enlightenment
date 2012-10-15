@@ -48,6 +48,9 @@ module Enlightenment
     autoload :ValidatesUniqueness,  'enlightenment/validations/validates_uniqueness'
   end
 
+  mattr_accessor :pages_layout
+  @@pages_layout = 'application'
+
   mattr_accessor :validate_models
   @@validate_models = {}
 
