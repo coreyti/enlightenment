@@ -7,11 +7,11 @@ require "enlightenment/version"
 Gem::Specification.new do |s|
   s.name        = "enlightenment"
   s.version     = Enlightenment::VERSION
-  s.authors     = ["TODO: Your name"]
-  s.email       = ["TODO: Your email"]
-  s.homepage    = "TODO"
-  s.summary     = "TODO: Summary of Enlightenment."
-  s.description = "TODO: Description of Enlightenment."
+  s.authors     = ["Corey Innis"]
+  s.email       = ["corey@coolerator.net"]
+  s.homepage    = "https://github.com/coreyti/enlightenment"
+  s.summary     = "WIP: Enlightenment."
+  s.description = "WIP: Enlightenment."
 
   s.files = Dir["{app,config,db,lib}/**/*"] + ["MIT-LICENSE", "Rakefile", "README.rdoc"]
 
