@@ -8,7 +8,8 @@ module Enlightenment
         :locals => {
           :config => validate_config,
           :models => validate_models
-        }
+        },
+        :formats => [:js]
       })
     end
 

@@ -3,8 +3,39 @@
 //= require jquery.validate
 
 (function($) {
-  $.enlightenment = {};
+  $.enlightenment = {
+    validator : {
+      settings : {
+        debug        : false,
+        rules        : {},
+        focusCleanup : true,
+        focusInvalid : false,
+        onkeyup      : false,
+        wrapper      : undefined,
+        showErrors   : undefined,
+        highlight    : undefined,
+        unhighlight  : undefined
+      },
+      // messages
 
+      prototype : {
+        addWrapper : function addWrapper(target) {
+          if(this.settings.wrapper) {
+            target = target.add(target.closest(this.settings.wrapper));
+          }
+
+          return target;
+        }
+      }
+    }
+  };
+
+  $.enlightenment.extend = function extend(extension) {
+    var validator = extension.validator || {};
+
+    $.extend(this.validator.settings,  validator.settings  || {});
+    $.extend(this.validator.prototype, validator.prototype || {});
+  };
 
 
   // extensions to jquery
@@ -77,10 +108,10 @@
     previous.originalMessage = this.settings.messages[element.name].remote;
     this.settings.messages[element.name].remote = previous.message;
 
-    if ( this.pending[element.name] ) {
+    if(pending[name]) {
       return "pending";
     }
-    if ( previous.old === value ) {
+    if(previous.old === value) {
       return previous.valid;
     }
 
@@ -141,22 +172,18 @@
     return "pending";
   });
 
-  $.validator.prototype.addWrapper = function(target) {
-    if(this.settings.wrapper) {
-      target = target.add(target.closest(this.settings.wrapper));
-    }
-
-    return target;
-  };
+  $(function() {
+    $.extend($.validator.prototype, $.enlightenment.validator.prototype);
+  });
 
   // TODO: make non-specific to bootstrap & app-custom label
-  $.validator.prototype.errorsFor = function(element) {
-    return $(element).closest('div.controls').find('label.error');
-  };
+  // $.validator.prototype.errorsFor = function(element) {
+  //   return $(element).closest('div.controls').find('label.error');
+  // };
 
   $.validator.messages = {
-    required    : message('invalid'),
     // remote      : message('invalid'),
+    required    : message('invalid'),
     email       : message('invalid'),
     url         : message('invalid'),
     date        : message('invalid'),

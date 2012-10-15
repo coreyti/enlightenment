@@ -1,6 +1,6 @@
 module Enlightenment
   module Validations
-    module ValidatesCallback
+    module CallbackValidator
       extend ActiveSupport::Concern
 
       module ClassMethods

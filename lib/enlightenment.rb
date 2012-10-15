@@ -42,8 +42,9 @@ module Enlightenment
   autoload :Rules,                  'enlightenment/rules'
 
   module Validations
+    autoload :CallbackValidator,    'enlightenment/validations/callback_validator'
+    autoload :CleanupValidator,     'enlightenment/validations/cleanup_validator'
     autoload :ValidatesAssociated,  'enlightenment/validations/validates_associated'
-    autoload :ValidatesCallback,    'enlightenment/validations/validates_callback'  # TODO: callback_validation?
     autoload :ValidatesUniqueness,  'enlightenment/validations/validates_uniqueness'
   end
 
