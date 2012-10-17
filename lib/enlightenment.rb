@@ -45,6 +45,7 @@ module Enlightenment
     autoload :CallbackValidator,    'enlightenment/validations/callback_validator'
     autoload :CleanupValidator,     'enlightenment/validations/cleanup_validator'
     autoload :ValidatesAssociated,  'enlightenment/validations/validates_associated'
+    autoload :ValidatesFormat,      'enlightenment/validations/validates_format'
     autoload :ValidatesUniqueness,  'enlightenment/validations/validates_uniqueness'
   end
 

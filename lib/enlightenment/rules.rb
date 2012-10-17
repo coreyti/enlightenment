@@ -5,6 +5,7 @@ module Enlightenment
     include Validations::CallbackValidator
     include Validations::CleanupValidator
     include Validations::ValidatesAssociated
+    include Validations::ValidatesFormat
     include Validations::ValidatesUniqueness
 
     class << self

@@ -16,7 +16,26 @@
         highlight    : undefined,
         unhighlight  : undefined
       },
-      // messages
+
+      messages : {
+        // remote      : message('invalid'),
+        required    : message('blank'),
+        regex       : message('invalid'),
+        email       : message('invalid'),
+        url         : message('invalid'),
+        date        : message('invalid'),
+        dateISO     : message('invalid'),
+        number      : message('invalid'),
+        digits      : message('invalid'),
+        creditcard  : message('invalid'),
+        equalTo     : message('invalid'),
+        maxlength   : message('invalid'),
+        minlength   : message('invalid'),
+        rangelength : message('invalid'),
+        range       : message('invalid'),
+        max         : message('invalid'),
+        min         : message('invalid')
+      },
 
       prototype : {
         addWrapper : function addWrapper(target) {
@@ -35,8 +54,13 @@
 
     $.extend(this.validator.settings,  validator.settings  || {});
     $.extend(this.validator.prototype, validator.prototype || {});
+    $.extend(this.validator.messages,  validator.messages  || {});
   };
 
+  $(function() {
+    $.extend($.validator.prototype, $.enlightenment.validator.prototype);
+    $.extend($.validator.messages,  $.enlightenment.validator.messages);
+  });
 
   // extensions to jquery
   // --------------------------------------------------------------------------
@@ -85,10 +109,9 @@
   // --------------------------------------------------------------------------
   $.validator.addMethod('regex', function(value, element, regexp) {
       var check = false;
-      var re = new RegExp(regexp.replace('\\A', '^').replace('\\z', '$'));
+      var re = eval(regexp);
       return this.optional(element) || re.test(value);
-    },
-    'You have entered an invalid value for this field'
+    }
   );
 
   $.validator.addMethod('remote', function(value, element, url) {
@@ -171,34 +194,6 @@
 
     return "pending";
   });
-
-  $(function() {
-    $.extend($.validator.prototype, $.enlightenment.validator.prototype);
-  });
-
-  // TODO: make non-specific to bootstrap & app-custom label
-  // $.validator.prototype.errorsFor = function(element) {
-  //   return $(element).closest('div.controls').find('label.error');
-  // };
-
-  $.validator.messages = {
-    // remote      : message('invalid'),
-    required    : message('invalid'),
-    email       : message('invalid'),
-    url         : message('invalid'),
-    date        : message('invalid'),
-    dateISO     : message('invalid'),
-    number      : message('invalid'),
-    digits      : message('invalid'),
-    creditcard  : message('invalid'),
-    equalTo     : message('invalid'),
-    maxlength   : message('invalid'),
-    minlength   : message('invalid'),
-    rangelength : message('invalid'),
-    range       : message('invalid'),
-    max         : message('invalid'),
-    min         : message('invalid')
-  };
 
   var pending = {};
 
